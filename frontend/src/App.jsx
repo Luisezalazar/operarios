@@ -1,39 +1,22 @@
-import React, { useEffect,useState } from 'react'
+import { Formulario } from './Formulario';
+import { Home } from './Home';
+import { useState } from 'react';
 
 
 function App() {
-  const [data,setData]= useState([])
-  useEffect(()=>{
-    fetch("http://localhost:8081/reportes")
-    .then(res=> res.json())
-    .then(data=> setData(data))
-    .catch(err => console.log(err));
-  },[])
+
+  const [user,setUser]= useState([])
+
+
   return (
-    <div style={{padding: "50px"}}>
-      
-      <table>
-        <thead>
-          <th>id_reporte</th>
-          <th>Hora</th>
-          <th>Actividad</th>
-          <th>Numero_vuelo</th>
-        </thead>
-        <tbody>
-          {data.map((d, i) => (
-            <tr key={i}>
-              <td>{d.id_reporte}</td>
-              <td>{d.Hora}</td>
-              <td>{d.Actividad}</td>
-              <td>{d.Numero_vuelo}</td>
-
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
+    <div className="App">
+     {
+      !user.length>0
+      ? <Formulario setUser={setUser}/>
+      : <Home user={user} setUser={setUser}/>
+     }
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
