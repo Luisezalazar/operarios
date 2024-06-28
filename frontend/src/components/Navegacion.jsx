@@ -7,11 +7,6 @@ import {
 
 const links = [
   {
-    link: '/',
-    text:'Inicio',
-    id:1,
-  },
-  {
     link: "/Planilla",
     text: "Planilla",
     id: 2,
@@ -20,6 +15,11 @@ const links = [
     link: "/Datos",
     text: "Datos",
     id: 3,
+  },
+  {
+    link: '/CerrarSesion',
+    text:'Cerrar Sesion',
+    id:4,
   }
 ]
 
@@ -54,9 +54,6 @@ return () => {
       ? "flex fixed  items-center w-full px-4 justify-around bg-slate-800" 
       : "flex fixed flex-col h-full items-center w-full px-4 justify-around bg-slate-800" 
     } >
-      <Link to={"/"} className="text-white font-semibold text-xl p-2" >
-      Logo
-       </Link>
       {
         windowDimension.innerWidth>768
         ? links.map((l) => (
