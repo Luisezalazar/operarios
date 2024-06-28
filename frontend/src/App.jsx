@@ -25,7 +25,7 @@ function App() {
       <Navegacion />
       <Routes>
           <Route path="/CerrarSesion" element={<CerrarSesion handleLogout={handleLogout} />} />
-          <Route path="/Planilla" element={<Planilla />} />
+          <Route path="/" element={<Planilla />} />
           <Route path="/Datos" element={<Datos />} />
       </Routes>
   </Router>

@@ -7,7 +7,7 @@ import {
 
 const links = [
   {
-    link: "/Planilla",
+    link: "/",
     text: "Planilla",
     id: 2,
   },

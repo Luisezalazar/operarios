@@ -6,7 +6,7 @@ const CerrarSesion = ({ handleLogout }) => {
 
     useEffect(() => {
         handleLogout();
-        navigate("/Planilla");
+        navigate("/");
     }, [handleLogout, navigate]);
 
     return (
