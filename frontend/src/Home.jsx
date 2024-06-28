@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Inicio from "./Screens/Inicio.jsx";
-import Planilla from './Screens/Planilla.jsx';
-import Datos from './Screens/Datos.jsx';
+import Inicio from "./screens/Inicio.jsx";
+import Planilla from './screens/Planilla.jsx';
+import Datos from './screens/Datos.jsx';
 import Navegacion from './components/Navegacion.jsx'
 
 export function Home({ user, setUser }) {
