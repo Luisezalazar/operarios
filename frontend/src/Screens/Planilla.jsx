@@ -9,37 +9,30 @@ const Planilla = () => {
   const [vehiculos, setVehiculos] = useState([]);
 
   useEffect(() => {
-    const fetchOperarios = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:8081/operario');
-        if (!response.ok) {
+        // Fetch operarios
+        const operariosResponse = await fetch('http://localhost:8081/operario');
+        if (!operariosResponse.ok) {
           throw new Error('Error al obtener operarios');
         }
-        const data = await response.json();
-        setOperarios(data);
-      } catch (error) {
-        console.error('Error fetching operarios:', error);
-      }
-    };
+        const operariosData = await operariosResponse.json();
+        setOperarios(operariosData);
 
-    fetchOperarios();
-  }, []);
-
-  useEffect(() => {
-    const fetchVehiculos = async () => {
-      try {
-        const response = await fetch('http://localhost:8081/vehiculo');
-        if (!response.ok) {
+        // Fetch vehiculos
+        const vehiculosResponse = await fetch('http://localhost:8081/vehiculo');
+        if (!vehiculosResponse.ok) {
           throw new Error('Error al obtener vehículos');
         }
-        const data = await response.json();
-        setVehiculos(data);
+        const vehiculosData = await vehiculosResponse.json();
+        setVehiculos(vehiculosData);
       } catch (error) {
-        console.error('Error fetching vehiculos:', error);
+        console.error('Error fetching data:', error);
+        setErrorMessage('Error al obtener datos del servidor');
       }
     };
 
-    fetchVehiculos();
+    fetchData();
   }, []);
 
   const handleActividadChange = (value) => {
@@ -58,18 +51,18 @@ const Planilla = () => {
 
     const formData = new FormData(event.target);
 
-    const hora = formData.get('hora').trim();
+    // Obtén la hora actual del sistema
+    const hora = new Date().toLocaleTimeString('es-ES', { hour12: false });
     const actividades = actividad;
     const tipo_actividades = tipo_actividad;
-    const operario = event.target.operario.id;
-    const vehiculo = formData.get('vehiculo').trim();
+    const operario = event.target.operario.value.split(' ')[0]; //luego del id borro todo después del espacio
+    const vehiculo = event.target.vehiculo.value.split(' ')[0];
     const numeroVuelo = formData.get('numero_vuelo').trim();
     const cargaSalmon = formData.get('cargaSalmon').trim();
     const cargaGeneral = formData.get('cargaGeneral').trim();
-    console.log(hora,actividad,tipo_actividad,operario,vehiculo,numeroVuelo,cargaGeneral,cargaSalmon)
 
     // Validar que todos los campos están completos
-    if (!hora  || !operario || !vehiculo || !numeroVuelo || !cargaSalmon || !cargaGeneral) {
+    if (!operario || !vehiculo || !numeroVuelo || !cargaSalmon || !cargaGeneral) {
       setErrorMessage('Todos los campos son obligatorios');
       setSuccessMessage('');
       return;
@@ -88,8 +81,8 @@ const Planilla = () => {
           operario,
           vehiculo,
           numeroVuelo,
-          cargaSalmon: cargaSalmon,
-          cargaGeneral: cargaGeneral
+          cargaSalmon,
+          cargaGeneral
         })
       });
 
@@ -99,15 +92,13 @@ const Planilla = () => {
 
       const resultFormulario = await responseFormulario.json();
       console.log('Formulario enviado:', resultFormulario);
+      setSuccessMessage('Todos los datos se han enviado correctamente');
+      setErrorMessage('');
     } catch (error) {
       console.error('Error:', error);
       setErrorMessage('Error al enviar el formulario');
       setSuccessMessage('');
-      return;
     }
-
-    setErrorMessage('');
-    setSuccessMessage('Todos los datos se han enviado correctamente');
   };
 
   return (
@@ -117,11 +108,6 @@ const Planilla = () => {
         {errorMessage && <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">{errorMessage}</div>}
         {successMessage && <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">{successMessage}</div>}
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="hora" className="block text-sm font-medium text-gray-700">Hora</label>
-            <input type="time" id="hora" name="hora" className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm" />
-          </div>
-
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">Actividad</label>
             <div className="flex items-center space-x-4 mt-2">
@@ -140,7 +126,7 @@ const Planilla = () => {
 
           {actividad === 'Retiro' && (
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">El operario:</label>
+              <label className="block text-sm font-medium text-gray-700">Tipo de Actividad</label>
               <div className="flex items-center space-x-4 mt-2">
                 <label className="inline-flex items-center">
                   <input type="radio" value="retira" className="mr-2"
@@ -148,9 +134,9 @@ const Planilla = () => {
                     onChange={() => handleTipo_actividadChange('retira')} />Retira
                 </label>
                 <label className="inline-flex items-center">
-                  <input type="radio" value="seLleva" className="mr-2"
-                    checked={tipo_actividad === 'seLleva'}
-                    onChange={() => handleTipo_actividadChange('seLleva')} />Se lleva
+                  <input type="radio" value="se lleva" className="mr-2"
+                    checked={tipo_actividad === 'se lleva'}
+                    onChange={() => handleTipo_actividadChange('se lleva')} />Se lleva
                 </label>
               </div>
             </div>
@@ -161,7 +147,7 @@ const Planilla = () => {
             <input list="listaoperario" id="operario" name="operario" className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm" />
             <datalist id="listaoperario">
               {operarios.map((operario) => (
-                <option key={operario.id_operario} value={`${operario.nombre} ${operario.apellido}`} id={"asdasd"} />
+                <option key={operario.id_operario} value={`${operario.id_operario} ${operario.nombre} ${operario.apellido}`} />
               ))}
             </datalist>
           </div>
@@ -171,7 +157,7 @@ const Planilla = () => {
             <input list="listavehiculo" id="vehiculo" name="vehiculo" className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm" />
             <datalist id="listavehiculo">
               {vehiculos.map((vehiculo) => (
-                <option key={vehiculo.id_vehiculo} value={`${vehiculo.modelo} ${vehiculo.patente}`} />
+                <option key={vehiculo.id_vehiculo} value={`${vehiculo.id_vehiculo} ${vehiculo.modelo} ${vehiculo.patente}`} />
               ))}
             </datalist>
           </div>
@@ -191,7 +177,9 @@ const Planilla = () => {
             <input type="number" id="cargaGeneral" name="cargaGeneral" className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm" />
           </div>
 
-          <button type="submit" className="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600">Enviar</button>
+          <div className="flex justify-center">
+            <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:bg-green-600">Enviar Formulario</button>
+          </div>
         </form>
       </div>
     </div>

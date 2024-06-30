@@ -1,51 +1,59 @@
 import React, { useEffect, useState } from 'react';
 
 const Datos = () => {
-  const [formulario, setFormulario] = useState([]);
-  const [vehiculo, setVehiculos] = useState([]);
-  const [operario, setOperarios] = useState([]);
+  const [formularios, setFormularios] = useState([]);
+  const [vehiculos, setVehiculos] = useState([]);
+  const [operarios, setOperarios] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8081/formulario")
-      .then(res => res.json())
-      .then(data => {
-        console.log('formulario:', data);
-        setFormulario(data);
-      })
-      .catch(err => console.log(err));
+    const fetchData = async () => {
+      try {
+        // Fetch datos del formulario
+        const formularioResponse = await fetch("http://localhost:8081/formulario");
+        if (!formularioResponse.ok) {
+          throw new Error('Error al obtener los formularios');
+        }
+        const formularioData = await formularioResponse.json();
+        setFormularios(formularioData);
 
-    fetch("http://localhost:8081/vehiculo")
-      .then(res => res.json())
-      .then(data => {
-        console.log('Vehiculo:', data);
-        setVehiculos(data);
-      })
-      .catch(err => console.log(err));
+        // Fetch datos de vehículos
+        const vehiculosResponse = await fetch("http://localhost:8081/vehiculo");
+        if (!vehiculosResponse.ok) {
+          throw new Error('Error al obtener los vehículos');
+        }
+        const vehiculosData = await vehiculosResponse.json();
+        setVehiculos(vehiculosData);
 
-    fetch("http://localhost:8081/operario")
-      .then(res => res.json())
-      .then(data => {
-        console.log('Operario:', data);
-        setOperarios(data);
-      })
-      .catch(err => console.log(err));
+        // Fetch datos de operarios
+        const operariosResponse = await fetch("http://localhost:8081/operario");
+        if (!operariosResponse.ok) {
+          throw new Error('Error al obtener los operarios');
+        }
+        const operariosData = await operariosResponse.json();
+        setOperarios(operariosData);
+      } catch (error) {
+        console.error('Error al obtener datos:', error);
+      }
+    };
+
+    fetchData();
   }, []);
 
   return (
-    <div className="bg-gray-100 flex items-center justify-center h-screen">
-      <div className="bg-white p-6 rounded-lg shadow-lg">
-        {formulario.map((d, i) => {
-          const operarioData = operario.find(op => op.id === d.OperarioId) || {};
-          const vehiculoData = vehiculo.find(v => v.id === d.VehiculoId) || {};
+    <div className="bg-gray-100 flex items-center justify-center min-h-screen">
+      <div className="bg-white p-6 rounded-lg shadow-lg max-h-screen overflow-y-auto">
+        {formularios.map((formulario, index) => {
+          const operarioData = operarios.find(op => op.id_operario === formulario.id_operario) || {};
+          const vehiculoData = vehiculos.find(v => v.id_vehiculo === formulario.id_vehiculo) || {};
 
           return (
-            <div key={i} className="mb-4">
+            <div key={index} className="mb-4">
               <h1 className="text-sm text-gray-900">
-                | Hora: {d.hora} | Actividad: {d.actividad} | El operario {operarioData.nombre} {operarioData.apellido} RUT: {operarioData.rut} TICA: {operarioData.tica} en el tractor de carga {vehiculoData.modelo} {vehiculoData.patente}, {d.actividad === 'Retiro' ? 'retira' : 'trae'} carga vuelo LA {d.numero_vuelo}:
+                || Hora: {formulario.hora} || Actividad: {formulario.actividad} || Operario: {operarioData.nombre} {operarioData.apellido} RUT: {operarioData.rut} TICA: {operarioData.tica}|| en el tractor de carga {vehiculoData.modelo} {vehiculoData.patente} || {formulario.tipo_actividad} {formulario.actividad === "Llegada" ? "trae" : " "} carga vuelo: LA {formulario.numero_vuelo}
               </h1>
               <ul className="list-disc list-inside ml-4 text-sm text-gray-900">
-                <li>{dollyData.cargaSalmon || 0} dolly Salmon</li>
-                <li>{dollyData.cargaGeneral || 0} dolly Carga General</li>
+                <li>{formulario.cargaSalmon} dolly con Salmon </li>
+                <li>{formulario.cargaGeneral} dolly con General</li>
               </ul>
             </div>
           );
