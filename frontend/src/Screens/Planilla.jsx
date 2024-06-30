@@ -1,87 +1,113 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const Planilla = () => {
-  const [cargaCount, setCargaCount] = useState(0);
-  const [cargas, setCargas] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [actividad, setActividad] = useState('');
-  const [operarioType, setOperarioType] = useState('registrado'); // Nuevo estado para tipo de operario
+  const [tipo_actividad, setTipo_actividad] = useState('');
+  const [operarios, setOperarios] = useState([]);
+  const [vehiculos, setVehiculos] = useState([]);
 
-  const handleAddCarga = () => {
-    setCargaCount(cargaCount + 1);
-    setCargas([...cargas, { id: cargaCount + 1, tipo: '', cantidad: '' }]);
-  };
+  useEffect(() => {
+    const fetchOperarios = async () => {
+      try {
+        const response = await fetch('http://localhost:8081/operario');
+        if (!response.ok) {
+          throw new Error('Error al obtener operarios');
+        }
+        const data = await response.json();
+        setOperarios(data);
+      } catch (error) {
+        console.error('Error fetching operarios:', error);
+      }
+    };
 
-  const handleRemoveCarga = (id) => {
-    setCargas(cargas.filter(carga => carga.id !== id));
-    setCargaCount(cargaCount - 1);
-  };
+    fetchOperarios();
+  }, []);
 
-  const handleCargaChange = (index, field, value) => {
-    const newCargas = [...cargas];
-    newCargas[index][field] = value;
-    setCargas(newCargas);
-  };
+  useEffect(() => {
+    const fetchVehiculos = async () => {
+      try {
+        const response = await fetch('http://localhost:8081/vehiculo');
+        if (!response.ok) {
+          throw new Error('Error al obtener vehículos');
+        }
+        const data = await response.json();
+        setVehiculos(data);
+      } catch (error) {
+        console.error('Error fetching vehiculos:', error);
+      }
+    };
+
+    fetchVehiculos();
+  }, []);
 
   const handleActividadChange = (value) => {
     setActividad(value);
+    if (value !== 'Retiro') {
+      setTipo_actividad('');
+    }
   };
 
-  const handleOperarioTypeChange = (type) => {
-    setOperarioType(type);
+  const handleTipo_actividadChange = (option) => {
+    setTipo_actividad(option);
   };
 
-  const handleModeloVehiculoChange = (value) => {
-    setModeloVehiculo(value);
-  };
-
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const hora = event.target.hora.value.trim();
-    const vehiculo = event.target.vehiculo.value.trim();
-    const modelo = event.target.modelo.value.trim();
-    const numeroVuelo = event.target.numero_vuelo.value.trim();
 
-    if (!hora || !actividad || !vehiculo || !modelo  || !numeroVuelo) {
+    const formData = new FormData(event.target);
+
+    const hora = formData.get('hora').trim();
+    const actividades = actividad;
+    const tipo_actividades = tipo_actividad;
+    const operario = event.target.operario.id;
+    const vehiculo = formData.get('vehiculo').trim();
+    const numeroVuelo = formData.get('numero_vuelo').trim();
+    const cargaSalmon = formData.get('cargaSalmon').trim();
+    const cargaGeneral = formData.get('cargaGeneral').trim();
+    console.log(hora,actividad,tipo_actividad,operario,vehiculo,numeroVuelo,cargaGeneral,cargaSalmon)
+
+    // Validar que todos los campos están completos
+    if (!hora  || !operario || !vehiculo || !numeroVuelo || !cargaSalmon || !cargaGeneral) {
       setErrorMessage('Todos los campos son obligatorios');
       setSuccessMessage('');
       return;
     }
 
-    for (let i = 0; i < cargas.length; i++) {
-      if (!cargas[i].tipo || !cargas[i].cantidad) {
-        setErrorMessage('Todos los campos son obligatorios');
-        setSuccessMessage('');
-        return;
-      }
-    }
+    try {
+      const responseFormulario = await fetch('http://localhost:8081/formulario', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          hora,
+          actividades,
+          tipo_actividades,
+          operario,
+          vehiculo,
+          numeroVuelo,
+          cargaSalmon: cargaSalmon,
+          cargaGeneral: cargaGeneral
+        })
+      });
 
-    if (operarioType === 'nuevo') {
-      const nombre = event.target.nombre.value.trim();
-      const apellido = event.target.apellido.value.trim();
-      const rut = event.target.rut.value.trim();
-      const tica = event.target.tica.value.trim();
-
-      if (!nombre || !apellido || !rut || !tica) {
-        setErrorMessage('Todos los campos para operario nuevo son obligatorios');
-        setSuccessMessage('');
-        return;
+      if (!responseFormulario.ok) {
+        throw new Error('Error al enviar el formulario');
       }
-    } else {
-      const operarioRegistrado = event.target.operarioRegistrado.value.trim();
 
-      if (!operarioRegistrado) {
-        setErrorMessage('Debe seleccionar un operario registrado');
-        setSuccessMessage('');
-        return;
-      }
+      const resultFormulario = await responseFormulario.json();
+      console.log('Formulario enviado:', resultFormulario);
+    } catch (error) {
+      console.error('Error:', error);
+      setErrorMessage('Error al enviar el formulario');
+      setSuccessMessage('');
+      return;
     }
 
     setErrorMessage('');
-    setSuccessMessage('Formulario enviado exitosamente');
-    // Procesar el formulario aquí
-    console.log('Formulario enviado:', { hora, actividad, vehiculo, modelo, numeroVuelo, cargas });
+    setSuccessMessage('Todos los datos se han enviado correctamente');
   };
 
   return (
@@ -93,7 +119,7 @@ const Planilla = () => {
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="hora" className="block text-sm font-medium text-gray-700">Hora</label>
-            <input type="text" id="hora" name="hora" className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm" />
+            <input type="time" id="hora" name="hora" className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm" />
           </div>
 
           <div className="mb-4">
@@ -102,115 +128,74 @@ const Planilla = () => {
               <label className="inline-flex items-center">
                 <input type="checkbox" value="Llegada" className="mr-2"
                   checked={actividad === 'Llegada'}
-                  onChange={(e) => handleActividadChange(e.target.checked ? 'Llegada' : '')} />Llegada
+                  onChange={() => handleActividadChange('Llegada')} />Llegada
               </label>
               <label className="inline-flex items-center">
                 <input type="checkbox" value="Retiro" className="mr-2"
                   checked={actividad === 'Retiro'}
-                  onChange={(e) => handleActividadChange(e.target.checked ? 'Retiro' : '')} />Retiro
+                  onChange={() => handleActividadChange('Retiro')} />Retiro
               </label>
             </div>
           </div>
+
+          {actividad === 'Retiro' && (
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">El operario:</label>
+              <div className="flex items-center space-x-4 mt-2">
+                <label className="inline-flex items-center">
+                  <input type="radio" value="retira" className="mr-2"
+                    checked={tipo_actividad === 'retira'}
+                    onChange={() => handleTipo_actividadChange('retira')} />Retira
+                </label>
+                <label className="inline-flex items-center">
+                  <input type="radio" value="seLleva" className="mr-2"
+                    checked={tipo_actividad === 'seLleva'}
+                    onChange={() => handleTipo_actividadChange('seLleva')} />Se lleva
+                </label>
+              </div>
+            </div>
+          )}
 
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Operario</label>
-            <div className="flex items-center space-x-4 mt-2">
-              <label className="inline-flex items-center">
-                <input type="radio" value="registrado" className="mr-2"
-                  checked={operarioType === 'registrado'}
-                  onChange={() => handleOperarioTypeChange('registrado')} />Registrado
-              </label>
-              <label className="inline-flex items-center">
-                <input type="radio" value="nuevo" className="mr-2"
-                  checked={operarioType === 'nuevo'}
-                  onChange={() => handleOperarioTypeChange('nuevo')} />Nuevo
-              </label>
-            </div>
+            <label htmlFor="operario" className="block text-sm font-medium text-gray-700">Operario</label>
+            <input list="listaoperario" id="operario" name="operario" className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm" />
+            <datalist id="listaoperario">
+              {operarios.map((operario) => (
+                <option key={operario.id_operario} value={`${operario.nombre} ${operario.apellido}`} id={"asdasd"} />
+              ))}
+            </datalist>
           </div>
-
-          {operarioType === 'nuevo' && (
-            <div>
-              <div className="mb-4">
-                <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">Nombre</label>
-                <input type="text" id="nombre" name="nombre" className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm" />
-              </div>
-
-              <div className="mb-4">
-                <label htmlFor="apellido" className="block text-sm font-medium text-gray-700">Apellido</label>
-                <input type="text" id="apellido" name="apellido" className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm" />
-              </div>
-
-              <div className="mb-4">
-                <label htmlFor="rut" className="block text-sm font-medium text-gray-700">RUT</label>
-                <input type="text" id="rut" name="rut" className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm" />
-              </div>
-
-              <div className="mb-4">
-                <label htmlFor="tica" className="block text-sm font-medium text-gray-700">TICA</label>
-                <input type="text" id="tica" name="tica" className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm" />
-              </div>
-            </div>
-          )}
-
-          {operarioType === 'registrado' && (
-            <div className="mb-4">
-              <label htmlFor="operarioRegistrado" className="block text-sm font-medium text-gray-700">Operario Registrado</label>
-              <input type="text" id="operarioRegistrado" name="operarioRegistrado" className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm" />
-            </div>
-          )}
 
           <div className="mb-4">
             <label htmlFor="vehiculo" className="block text-sm font-medium text-gray-700">Vehículo</label>
-            <input type="text" id="vehiculo" name="vehiculo" className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm" />
+            <input list="listavehiculo" id="vehiculo" name="vehiculo" className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm" />
+            <datalist id="listavehiculo">
+              {vehiculos.map((vehiculo) => (
+                <option key={vehiculo.id_vehiculo} value={`${vehiculo.modelo} ${vehiculo.patente}`} />
+              ))}
+            </datalist>
           </div>
 
           <div className="mb-4">
-            <label htmlFor="modelo" className="block text-sm font-medium text-gray-700">Modelo</label>
-            <input type="text" id="modelo" name="modelo" className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
-              onChange={(e) => handleModeloVehiculoChange(e.target.value)} />
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="numero_vuelo" className="block text-sm font-medium text-gray-700">Número de vuelo</label>
+            <label htmlFor="numero_vuelo" className="block text-sm font-medium text-gray-700">Número de Vuelo</label>
             <input type="text" id="numero_vuelo" name="numero_vuelo" className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm" />
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Carga: <span>{cargaCount}</span></label>
-            <button type="button" onClick={handleAddCarga} className="mt-2 px-4 py-2 bg-green-500 text-white font-semibold rounded-md shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500">Añadir carga</button>
+            <label htmlFor="cargaSalmon" className="block text-sm font-medium text-gray-700">Cantidad de Salmón</label>
+            <input type="number" id="cargaSalmon" name="cargaSalmon" className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm" />
           </div>
 
-          {cargas.map((carga, index) => (
-            <div key={carga.id} className="mb-4 border p-4 rounded-md">
-              <div className="flex justify-between items-center">
-                <label className="block text-sm font-medium text-gray-700">Tipo de carga:</label>
-                <button type="button" onClick={() => handleRemoveCarga(carga.id)} className="ml-4 px-2 py-1 bg-red-500 text-white font-semibold rounded-md shadow hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500">Eliminar</button>
-              </div>
-              <div>
-                <label className="inline-flex items-center">
-                  <input type="radio" name={`tipo_carga_${carga.id}`} value="salmon" className="mr-2"
-                    onChange={(e) => handleCargaChange(index, 'tipo', e.target.value)} />Salmon
-                </label>
-                <label className="inline-flex items-center ml-4">
-                  <input type="radio" name={`tipo_carga_${carga.id}`} value="otro" className="mr-2"
-                    onChange={(e) => handleCargaChange(index, 'tipo', e.target.value)} />Otro
-                </label>
-              </div>
-
-              <label className="block text-sm font-medium text-gray-700 mt-2">Cantidad:</label>
-              <input type="text" name={`cantidad_carga_${carga.id}`} className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                onChange={(e) => handleCargaChange(index, 'cantidad', e.target.value)} />
-            </div>
-          ))}
-
-          <div className="flex justify-end mt-6">
-            <button type="submit" className="px-4 py-2 bg-green-500 text-white font-semibold rounded-md shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500">Enviar</button>
+          <div className="mb-4">
+            <label htmlFor="cargaGeneral" className="block text-sm font-medium text-gray-700">Cantidad General</label>
+            <input type="number" id="cargaGeneral" name="cargaGeneral" className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm" />
           </div>
 
+          <button type="submit" className="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600">Enviar</button>
         </form>
       </div>
     </div>
   );
-}
+};
 
 export default Planilla;

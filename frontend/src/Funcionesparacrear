@@ -1,0 +1,101 @@
+// const [operarioType, setOperarioType] = useState('registrado'); // Nuevo estado para tipo de operario
+
+// const handleOperarioTypeChange = (type) => {
+    //   setOperarioType(type);
+    // };
+
+
+// if (operarioType === 'nuevo') {
+    //   const nombre = event.target.nombre.value.trim();
+    //   const apellido = event.target.apellido.value.trim();
+    //   const rut = event.target.rut.value.trim();
+    //   const tica = event.target.tica.value.trim();
+
+    //   if (!nombre || !apellido || !rut || !tica) {
+    //     setErrorMessage('Todos los campos para operario nuevo son obligatorios');
+    //     setSuccessMessage('');
+    //     return;
+    //   }
+    // } else {
+      // const operarioRegistrado = event.target.operarioRegistrado.value.trim();
+
+    //   if (!operarioRegistrado) {
+    //     setErrorMessage('Debe seleccionar un operario registrado');
+    //     setSuccessMessage('');
+    //     return;
+    //   }
+    // }
+          
+          
+          {/* <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Operario</label>
+            <div className="flex items-center space-x-4 mt-2">
+              {/* <label className="inline-flex items-center">
+                <input type="radio" value="registrado" className="mr-2"
+                  checked={operarioType === 'registrado'}
+                  onChange={() => handleOperarioTypeChange('registrado')} />Registrado
+              </label> */}
+              {/* <label className="inline-flex items-center">
+                <input type="radio" value="nuevo" className="mr-2"
+                  checked={operarioType === 'nuevo'}
+                  onChange={() => handleOperarioTypeChange('nuevo')} />Nuevo
+              </label> */}
+            {/* </div>
+          </div> */}
+{/* 
+          {operarioType === 'nuevo' && (
+            <div>
+              <div className="mb-4">
+                <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">Nombre</label>
+                <input type="text" id="nombre" name="nombre" className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm" />
+              </div>
+
+              <div className="mb-4">
+                <label htmlFor="apellido" className="block text-sm font-medium text-gray-700">Apellido</label>
+                <input type="text" id="apellido" name="apellido" className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm" />
+              </div>
+
+              <div className="mb-4">
+                <label htmlFor="rut" className="block text-sm font-medium text-gray-700">RUT</label>
+                <input type="text" id="rut" name="rut" className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm" />
+              </div>
+
+              <div className="mb-4">
+                <label htmlFor="tica" className="block text-sm font-medium text-gray-700">TICA</label>
+                <input type="text" id="tica" name="tica" className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm" />
+              </div>
+            </div>
+          )} } */}
+
+          {/* {operarioType === 'registrado' && ( */}
+
+
+
+
+// // Ruta para insertar nuevo registro de vehiculos
+// app.post('/vehiculo', (req, res) => {
+//     const {vehiculo, modelo } = req.body;
+//     const sql = "INSERT INTO vehiculo (vehiculo, modelo) VALUES (?, ?)";
+//     const values = [vehiculo, modelo];
+
+//     db.query(sql, values, (err, result) => {
+//         if (err) {
+//             return res.status(500).json({ error: err.message });
+//         }
+//         return res.status(200).json({ message: 'Formulario enviado exitosamente', result });
+//     });
+// });
+
+// //Ruta para insertar operarios
+// app.post('/operario', (req, res) => {
+//     const {operario} = req.body;
+//     const sql = "INSERT INTO operario (operario) VALUES (?)";
+//     const values = [operario];
+
+//     db.query(sql, values, (err, result) => {
+//         if (err) {
+//             return res.status(500).json({ error: err.message });
+//         }
+//         return res.status(200).json({ message: 'Formulario enviado exitosamente', result });
+//     });
+// });

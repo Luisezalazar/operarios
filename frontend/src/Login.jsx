@@ -37,7 +37,7 @@ export function Login({ setUser }) {
     return (
         <section className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
             <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm">
-                <h1 className="text-2xl mb-4 text-blue-800">Login</h1>
+                <h1 className="text-2xl mb-4 text-blue-800 items-center justify-center flex">Bienvenido</h1>
                 <form onSubmit={handleSubmit} className="flex flex-col items-center space-y-4">
                     <input 
                         className="p-2 border border-gray-800 rounded w-64" 
