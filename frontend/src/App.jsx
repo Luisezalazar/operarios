@@ -1,7 +1,7 @@
 import { Login } from './Login';
 import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import CerrarSesion from "./screens/CerrarSesion.jsx";
+import CerrarSesion from './screens/CerrarSesion.jsx';
 import Planilla from './screens/Planilla.jsx';
 import Datos from './screens/Datos.jsx';
 import Navegacion from './components/Navegacion.jsx';
