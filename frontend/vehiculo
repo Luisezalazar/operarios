@@ -1,0 +1,11 @@
+
+  {
+    "id_vehiculo": 2,
+    "modelo": "TLD",
+    "patente": "26"
+  },
+  {
+    "id_vehiculo": 1,
+    "modelo": "Charlatte",
+    "patente": "51210"
+  }

@@ -9,7 +9,7 @@ const Datos = () => {
     const fetchData = async () => {
       try {
         // Fetch datos del formulario
-        const formularioResponse = await fetch("http://localhost:8081/formulario");
+        const formularioResponse = await fetch("https://operarios-backend-two.vercel.app/api/formularios");
         if (!formularioResponse.ok) {
           throw new Error('Error al obtener los formularios');
         }
@@ -17,7 +17,7 @@ const Datos = () => {
         setFormularios(formularioData);
 
         // Fetch datos de vehículos
-        const vehiculosResponse = await fetch("http://localhost:8081/vehiculo");
+        const vehiculosResponse = await fetch("https://operarios-backend-two.vercel.app/api/vehiculos");
         if (!vehiculosResponse.ok) {
           throw new Error('Error al obtener los vehículos');
         }
@@ -25,7 +25,7 @@ const Datos = () => {
         setVehiculos(vehiculosData);
 
         // Fetch datos de operarios
-        const operariosResponse = await fetch("http://localhost:8081/operario");
+        const operariosResponse = await fetch("https://operarios-backend-two.vercel.app/api/operarios");
         if (!operariosResponse.ok) {
           throw new Error('Error al obtener los operarios');
         }
